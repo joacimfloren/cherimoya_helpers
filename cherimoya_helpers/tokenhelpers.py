@@ -101,5 +101,5 @@ def authorize_via_event(event, user_pool_id, user_pool_client_id, aws_region, lo
         return generate_policy(payload["sub"], "Allow", event["methodArn"], logger)
     except Exception as e:
         logger.info('TokenHelpers.py - Exception raised')
-        return generate_policy(payload["sub"], "Deny", event["methodArn"], logger)
+        return generate_policy("Unauthorized", "Deny", event["methodArn"], logger)
 
