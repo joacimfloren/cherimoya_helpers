@@ -4,7 +4,7 @@ from jwt import PyJWKClient # Install with `pip install PyJWT`
 def verify_token(token, user_pool_id, user_pool_client_id, aws_region, logger):
     """Verifies the JWT token using Cognito public keys"""
     
-    logger.debug('TokenHelpers.py - Verify token')
+    logger.info('TokenHelpers.py - Verify token')
 
     issuer = f"https://cognito-idp.{aws_region}.amazonaws.com/{user_pool_id}"
     url = issuer + "/.well-known/jwks.json"
@@ -20,7 +20,7 @@ def verify_token(token, user_pool_id, user_pool_client_id, aws_region, logger):
         issuer=issuer
     )
 
-    logger.debug(payload)
+    logger.info(payload)
 
     return payload
 
@@ -45,7 +45,7 @@ def get_logged_in_user(token, user_pool_id, user_pool_client_id, aws_region, log
 def generate_policy(principal_id, effect, resource, logger):
     """Generates an IAM policy"""
     
-    logger.debug('TokenHelpers.py - Generate policy')
+    logger.info('TokenHelpers.py - Generate policy')
 
     return {
         "principalId": principal_id,
@@ -80,8 +80,8 @@ def get_logged_in_user_via_event(event, user_pool_id, user_pool_client_id, aws_r
 
 def authorize_via_event(event, user_pool_id, user_pool_client_id, aws_region, logger):
     try:
-        logger.debug('TokenHelpers.py - Authorize via event')
-        logger.debug(event)
+        logger.info('TokenHelpers.py - Authorize via event')
+        logger.info(event)
 
         if "headers" in event and "Authorization" in event["headers"]:
             token = event["headers"].get("Authorization")
@@ -96,5 +96,5 @@ def authorize_via_event(event, user_pool_id, user_pool_client_id, aws_region, lo
 
         return generate_policy(payload["sub"], "Allow", event["methodArn"])
     except Exception as e:
-        logger.debug('TokenHelpers.py - Exception raised')
+        logger.info('TokenHelpers.py - Exception raised')
         raise Exception(f"Authorization error. Authorization failed: {e}")
