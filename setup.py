@@ -8,8 +8,8 @@ here = path.abspath(path.dirname(__file__))
 with open(path.join(here, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
 
-# with open(path.join(here, "package_requirements.txt")) as f:
-#     deps = [l.strip() for l in f.readlines() if l.strip() != "" and not l.strip().startswith("#")]
+with open(path.join(here, "requirements.txt")) as f:
+    deps = [l.strip() for l in f.readlines() if l.strip() != "" and not l.strip().startswith("#")]
 
 setup(
     name='cherimoya_helpers',
@@ -23,6 +23,6 @@ setup(
     # zip_safe=False
     long_description_content_type="text/markdown",
     long_description=long_description,
-    install_requires=["boto3"],
+    install_requires=deps,
     include_package_data=True,
 )
