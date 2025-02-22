@@ -4,7 +4,7 @@ from jwt import PyJWKClient # Install with `pip install PyJWT`
 def verify_token(token, user_pool_id, user_pool_client_id, aws_region, logger):
     """Verifies the JWT token using Cognito public keys"""
     
-    logger.info('TokenHelpers.py - Verify token')
+    logger.debug('TokenHelpers.py - Verify token')
 
     issuer = f"https://cognito-idp.{aws_region}.amazonaws.com/{user_pool_id}"
     url = issuer + "/.well-known/jwks.json"
@@ -20,7 +20,7 @@ def verify_token(token, user_pool_id, user_pool_client_id, aws_region, logger):
         issuer=issuer
     )
 
-    logger.info(payload)
+    logger.debug(payload)
 
     return payload
 
@@ -45,7 +45,7 @@ def get_logged_in_user(token, user_pool_id, user_pool_client_id, aws_region, log
 def generate_policy(principal_id, effect, resource, logger):
     """Generates an IAM policy"""
     
-    logger.info('TokenHelpers.py - Generate policy')
+    logger.debug('TokenHelpers.py - Generate policy')
 
     return {
         "principalId": principal_id,
@@ -76,14 +76,14 @@ def get_logged_in_user_via_event(event, user_pool_id, user_pool_client_id, aws_r
 
         return get_logged_in_user(token, user_pool_id, user_pool_client_id, aws_region, logger)
     except Exception as e:
-        logger.info('TokenHelpers.py - Exception raised when getting logged in user')
+        logger.debug('TokenHelpers.py - Exception raised when getting logged in user')
         return None
     
 
 def authorize_via_event(event, user_pool_id, user_pool_client_id, aws_region, logger):
     try:
-        logger.info('TokenHelpers.py - Authorize via event')
-        logger.info(event)
+        logger.debug('TokenHelpers.py - Authorize via event')
+        logger.debug(event)
         
         token = None  # Ensure token is initialized
 
@@ -100,6 +100,6 @@ def authorize_via_event(event, user_pool_id, user_pool_client_id, aws_region, lo
 
         return generate_policy(payload["sub"], "Allow", event["methodArn"], logger)
     except Exception as e:
-        logger.info('TokenHelpers.py - Exception raised')
+        logger.debug('TokenHelpers.py - Exception raised')
         return generate_policy("Unauthorized", "Deny", event["methodArn"], logger)
 
