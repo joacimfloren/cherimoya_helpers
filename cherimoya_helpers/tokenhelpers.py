@@ -27,7 +27,7 @@ def verify_token(token, user_pool_id, user_pool_client_id, aws_region, logger):
 # Decode JWT and get user info
 def get_logged_in_user(token, user_pool_id, user_pool_client_id, aws_region, logger):
     try:
-        payload = verify_token(token, user_pool_id, user_pool_client_id, aws_region)
+        payload = verify_token(token, user_pool_id, user_pool_client_id, aws_region, logger)
 
         return {
             "user_id": payload["sub"],  # Unique Cognito User ID
@@ -73,7 +73,7 @@ def get_logged_in_user_via_event(event, user_pool_id, user_pool_client_id, aws_r
 
         token = token.split(" ")[1]  # Remove "Bearer " prefix
 
-        return get_logged_in_user(token, user_pool_id, user_pool_client_id, aws_region)
+        return get_logged_in_user(token, user_pool_id, user_pool_client_id, aws_region, logger)
     except Exception as e:
         raise Exception(f"Event missing data. Authorization failed: {e}")
     
@@ -94,7 +94,7 @@ def authorize_via_event(event, user_pool_id, user_pool_client_id, aws_region, lo
         token = token.split(" ")[1]  # Remove "Bearer " prefix
         payload = verify_token(token, user_pool_id, user_pool_client_id, aws_region, logger)
 
-        return generate_policy(payload["sub"], "Allow", event["methodArn"])
+        return generate_policy(payload["sub"], "Allow", event["methodArn"], logger)
     except Exception as e:
         logger.info('TokenHelpers.py - Exception raised')
         raise Exception(f"Authorization error. Authorization failed: {e}")
