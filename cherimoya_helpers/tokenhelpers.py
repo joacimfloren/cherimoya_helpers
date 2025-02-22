@@ -1,8 +1,11 @@
 import jwt 
 from jwt import PyJWKClient # Install with `pip install PyJWT`
 
-def verify_token(token, user_pool_id, user_pool_client_id, aws_region):
+def verify_token(token, user_pool_id, user_pool_client_id, aws_region, logger):
     """Verifies the JWT token using Cognito public keys"""
+    
+    logger.debug('TokenHelpers.py - Verify token')
+
     issuer = f"https://cognito-idp.{aws_region}.amazonaws.com/{user_pool_id}"
     url = issuer + "/.well-known/jwks.json"
     
@@ -17,10 +20,12 @@ def verify_token(token, user_pool_id, user_pool_client_id, aws_region):
         issuer=issuer
     )
 
+    logger.debug(payload)
+
     return payload
 
 # Decode JWT and get user info
-def get_logged_in_user(token, user_pool_id, user_pool_client_id, aws_region):
+def get_logged_in_user(token, user_pool_id, user_pool_client_id, aws_region, logger):
     try:
         payload = verify_token(token, user_pool_id, user_pool_client_id, aws_region)
 
@@ -37,8 +42,11 @@ def get_logged_in_user(token, user_pool_id, user_pool_client_id, aws_region):
         raise Exception("Invalid token")
     
 
-def generate_policy(principal_id, effect, resource):
+def generate_policy(principal_id, effect, resource, logger):
     """Generates an IAM policy"""
+    
+    logger.debug('TokenHelpers.py - Generate policy')
+
     return {
         "principalId": principal_id,
         "policyDocument": {
@@ -53,7 +61,7 @@ def generate_policy(principal_id, effect, resource):
         }
     }
 
-def get_logged_in_user_via_event(event, user_pool_id, user_pool_client_id, aws_region):
+def get_logged_in_user_via_event(event, user_pool_id, user_pool_client_id, aws_region, logger):
     try:
         if "headers" in event and "Authorization" in event["headers"]:
             token = event["headers"].get("Authorization")
@@ -70,8 +78,11 @@ def get_logged_in_user_via_event(event, user_pool_id, user_pool_client_id, aws_r
         raise Exception(f"Event missing data. Authorization failed: {e}")
     
 
-def authorize_via_event(event, user_pool_id, user_pool_client_id, aws_region):
+def authorize_via_event(event, user_pool_id, user_pool_client_id, aws_region, logger):
     try:
+        logger.debug('TokenHelpers.py - Authorize via event')
+        logger.debug(event)
+
         if "headers" in event and "Authorization" in event["headers"]:
             token = event["headers"].get("Authorization")
         elif "authorizationToken" in event:
@@ -85,4 +96,5 @@ def authorize_via_event(event, user_pool_id, user_pool_client_id, aws_region):
 
         return generate_policy(payload["sub"], "Allow", event["methodArn"])
     except Exception as e:
+        logger.debug('TokenHelpers.py - Exception raised')
         raise Exception(f"Authorization error. Authorization failed: {e}")
