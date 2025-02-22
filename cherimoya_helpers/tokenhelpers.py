@@ -92,7 +92,7 @@ def authorize_via_event(event, user_pool_id, user_pool_client_id, aws_region, lo
             raise Exception("Missing or invalid Authorization header")
 
         token = token.split(" ")[1]  # Remove "Bearer " prefix
-        payload = verify_token(token, user_pool_id, user_pool_client_id, aws_region)
+        payload = verify_token(token, user_pool_id, user_pool_client_id, aws_region, logger)
 
         return generate_policy(payload["sub"], "Allow", event["methodArn"])
     except Exception as e:
