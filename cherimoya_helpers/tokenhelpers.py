@@ -60,6 +60,7 @@ def generate_policy(principal_id, effect, resource, logger):
             ]
         }
     }
+    
 
 def get_logged_in_user_via_event(event, user_pool_id, user_pool_client_id, aws_region, logger):
     try:
@@ -75,13 +76,16 @@ def get_logged_in_user_via_event(event, user_pool_id, user_pool_client_id, aws_r
 
         return get_logged_in_user(token, user_pool_id, user_pool_client_id, aws_region, logger)
     except Exception as e:
-        raise Exception(f"Event missing data. Authorization failed: {e}")
+        logger.info('TokenHelpers.py - Exception raised when getting logged in user')
+        return None
     
 
 def authorize_via_event(event, user_pool_id, user_pool_client_id, aws_region, logger):
     try:
         logger.info('TokenHelpers.py - Authorize via event')
         logger.info(event)
+        
+        token = None  # Ensure token is initialized
 
         if "headers" in event and "Authorization" in event["headers"]:
             token = event["headers"].get("Authorization")
@@ -97,4 +101,5 @@ def authorize_via_event(event, user_pool_id, user_pool_client_id, aws_region, lo
         return generate_policy(payload["sub"], "Allow", event["methodArn"], logger)
     except Exception as e:
         logger.info('TokenHelpers.py - Exception raised')
-        raise Exception(f"Authorization error. Authorization failed: {e}")
+        return generate_policy(payload["sub"], "Deny", event["methodArn"], logger)
+
