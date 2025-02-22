@@ -1,4 +1,6 @@
 rope
 flake8
 build
--r package_requirements.txt
+boto3
+PyJWT
+cryptography
