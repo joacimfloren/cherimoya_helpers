@@ -77,6 +77,7 @@ def get_logged_in_user_via_event(event, user_pool_id, user_pool_client_id, aws_r
         return get_logged_in_user(token, user_pool_id, user_pool_client_id, aws_region, logger)
     except Exception as e:
         logger.debug('TokenHelpers.py - Exception raised when getting logged in user')
+        logger.debug(e)
         return None
     
 
